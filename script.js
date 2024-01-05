@@ -1,26 +1,42 @@
 const draggableList = document.getElementById("draggable-list");
 const checkBtn = document.getElementById("check");
-const richPersonInput = document.getElementById("richPersonInput");
 
-let richestPeople = [];
+const vals = [];
+
 const listItems = [];
 let dragStartIndex;
 
-createList();
-
+// Function to create the draggable list with user input
 function createList() {
-    // Sort the array alphabetically
-    richestPeople = richestPeople.sort((a, b) => a.localeCompare(b));
+    // Clear existing values
+    alert("Please enter 10 values:");
+    vals.length = 0;
+    // Take user input for 10 values
+    for (let i = 0; i < 10; i++) {
+        
+        const userInput = prompt(`Enter value ${i + 1}:`);
+        if (userInput) {
+            vals.push(userInput.trim());
+        } else {
+            // If user cancels or enters an empty value, ask again for the same index
+            i--;
+        }
+    }
 
-    richestPeople.forEach((person, index) => {
+    // Sort the array alphabetically
+    vals.sort();
+
+    // Create list items
+    vals.forEach((person, index) => {
         const listItem = createListItem(person, index);
         listItems.push(listItem);
         draggableList.appendChild(listItem);
     });
 
-    addEventListener();
+    addEventListeners();
 }
 
+// Function to create a list item
 function createListItem(person, index) {
     const listItem = document.createElement('li');
     listItem.setAttribute('data-index', index);
@@ -32,18 +48,6 @@ function createListItem(person, index) {
         </div>
     `;
     return listItem;
-}
-
-function addRichPerson() {
-    const newPerson = richPersonInput.value.trim();
-    if (newPerson !== "") {
-        richestPeople.push(newPerson);
-        const newIndex = richestPeople.length - 1;
-        const newListItem = createListItem(newPerson, newIndex);
-        listItems.push(newListItem);
-        draggableList.appendChild(newListItem);
-        richPersonInput.value = ""; // Clear the input field
-    }
 }
 
 function dragStart() {
@@ -77,28 +81,19 @@ function swapItems(fromIndex, toIndex) {
 }
 
 function checkOrder() {
-    let correctOrder = true;
-
     listItems.forEach((listItem, index) => {
-        const personName = listItem.querySelector('.draggable').innerText.trim();
+        const inps = listItem.querySelector('.draggable').innerText.trim();
 
-        if (personName !== richestPeople[index]) {
-            correctOrder = false;
+        if (inps !== vals[index]) {
             listItem.classList.add('wrong');
         } else {
             listItem.classList.remove('wrong');
             listItem.classList.add('right');
         }
     });
-
-    if (correctOrder) {
-        alert("Congratulations! The order is correct.");
-    } else {
-        alert("The order is incorrect. Please try again.");
-    }
 }
 
-function addEventListener() {
+function addEventListeners() {
     const draggables = document.querySelectorAll('.draggable');
     const dragListItems = document.querySelectorAll('.draggable-list li');
 
@@ -113,5 +108,8 @@ function addEventListener() {
         item.addEventListener('dragleave', dragLeave);
     });
 }
+
+// Call createList function to start the process
+createList();
 
 checkBtn.addEventListener("click", checkOrder);
